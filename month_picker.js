@@ -12,17 +12,27 @@ var MONTHS = [
   "Nov",
   "Dec",
 ];
+var selectedstartDate, selectedEndDate;
 $(function () {
   startMonth = 1;
   startYear = 2020;
-  endMonth = 1;
+  endMonth = 12;
   endYear = 2022;
   fiscalMonth = 7;
-  if (startMonth < 10)
+  if (startMonth < 10) {
     startDate = parseInt("" + startYear + "0" + startMonth + "");
-  else startDate = parseInt("" + startYear + startMonth + "");
-  if (endMonth < 10) endDate = parseInt("" + endYear + "0" + endMonth + "");
-  else endDate = parseInt("" + endYear + endMonth + "");
+    selectedstartDate = startDate;
+  } else {
+    startDate = parseInt("" + startYear + startMonth + "");
+    selectedstartDate = startDate;
+  }
+  if (endMonth < 10) {
+    endDate = parseInt("" + endYear + "0" + endMonth + "");
+    selectedEndDate = endDate;
+  } else {
+    endDate = parseInt("" + endYear + endMonth + "");
+    selectedEndDate = endDate;
+  }
   content = '<div class="row mpr-calendarholder">';
   calendarCount = endYear - startYear;
   if (calendarCount == 0) calendarCount++;
@@ -74,7 +84,7 @@ $(function () {
           $(".mpr-calendar:last h5 span").html(year);
         endDate = startDate;
       }
-      console.log(startDate, "start date");
+      selectedstartDate = startDate;
     } else {
       //End Date
       endDate = parseInt("" + year + monthnum);
@@ -83,7 +93,7 @@ $(function () {
           $(".mpr-calendar:first h5 span").html(year);
         startDate = endDate;
       }
-      console.log(endDate, "end date");
+      selectedEndDate = endDate;
     }
     paintMonths();
   });
@@ -246,6 +256,25 @@ $(function () {
       mprVisible = false;
     }
   });
+});
+$("#submit").click((e) => {
+  console.log(selectedstartDate, "start date");
+  console.log(selectedEndDate, "end date");
+  window.parent.postMessage(
+    JSON.stringify({
+      event_code: "ym-client-event",
+      data: JSON.stringify({
+        event: {
+          code: "data",
+          data: {
+            startDate: selectedstartDate,
+            endDate: selectedEndDate,
+          },
+        },
+      }),
+    }),
+    "*"
+  );
 });
 function setViewToCurrentYears() {
   var startyear = parseInt(startDate / 100);
