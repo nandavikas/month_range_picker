@@ -1,4 +1,48 @@
- mpr-month">' +
+var MONTHS = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+$(function () {
+  startMonth = 1;
+  startYear = 2020;
+  endMonth = 1;
+  endYear = 2022;
+  fiscalMonth = 7;
+  if (startMonth < 10)
+    startDate = parseInt("" + startYear + "0" + startMonth + "");
+  else startDate = parseInt("" + startYear + startMonth + "");
+  if (endMonth < 10) endDate = parseInt("" + endYear + "0" + endMonth + "");
+  else endDate = parseInt("" + endYear + endMonth + "");
+  content = '<div class="row mpr-calendarholder">';
+  calendarCount = endYear - startYear;
+  if (calendarCount == 0) calendarCount++;
+  var d = new Date();
+  for (y = 0; y < 2; y++) {
+    content +=
+      '<div class="col-xs-6" ><div class="mpr-calendar row" id="mpr-calendar-' +
+      (y + 1) +
+      '">' +
+      '<h5 class="col-xs-12"><i class="mpr-yeardown fa fa-chevron-circle-left"></i><span>' +
+      (startYear + y).toString() +
+      '</span><i class="mpr-yearup fa fa-chevron-circle-right"></i></h5><div class="mpr-monthsContainer"><div class="mpr-MonthsWrapper">';
+    for (m = 0; m < 12; m++) {
+      var monthval;
+      if (m + 1 < 10) monthval = "0" + (m + 1);
+      else monthval = "" + (m + 1);
+      content +=
+        '<span data-month="' +
+        monthval +
+        '" class="col-xs-3 mpr-month">' +
         MONTHS[m] +
         "</span>";
     }
