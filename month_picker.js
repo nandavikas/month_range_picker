@@ -1,56 +1,18 @@
-var MONTHS = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
-$(function () {
-  startMonth = 1;
-  startYear = 2020;
-  endMonth = 1;
-  endYear = 2022;
-  fiscalMonth = 7;
-  if (startMonth < 10)
-    startDate = parseInt("" + startYear + "0" + startMonth + "");
-  else startDate = parseInt("" + startYear + startMonth + "");
-  if (endMonth < 10) endDate = parseInt("" + endYear + "0" + endMonth + "");
-  else endDate = parseInt("" + endYear + endMonth + "");
-
-  content = '<div class="row mpr-calendarholder">';
-  calendarCount = endYear - startYear;
-  if (calendarCount == 0) calendarCount++;
-  var d = new Date();
-  for (y = 0; y < 2; y++) {
-    content +=
-      '<div class="col-xs-6" ><div class="mpr-calendar row" id="mpr-calendar-' +
-      (y + 1) +
-      '">' +
-      '<h5 class="col-xs-12"><i class="mpr-yeardown fa fa-chevron-circle-left"></i><span>' +
-      (startYear + y).toString() +
-      '</span><i class="mpr-yearup fa fa-chevron-circle-right"></i></h5><div class="mpr-monthsContainer"><div class="mpr-MonthsWrapper">';
-    for (m = 0; m < 12; m++) {
-      var monthval;
-      if (m + 1 < 10) monthval = "0" + (m + 1);
-      else monthval = "" + (m + 1);
-      content +=
-        '<span data-month="' +
-        monthval +
-        '" class="col-xs-3 mpr-month">' +
+ mpr-month">' +
         MONTHS[m] +
         "</span>";
     }
     content += "</div></div></div></div>";
   }
-
+  //   content += '<div class="col-xs-1"> <h5 class="mpr-quickset">Quick Set</h5>';
+  //   content += '<button class="btn btn-info mpr-fiscal-ytd">Fiscal YTD</button>';
+  //   content += '<button class="btn btn-info mpr-ytd">YTD</button>';
+  //   content +=
+  //     '<button class="btn btn-info mpr-prev-fiscal">Previous FY</button>';
+  //   content +=
+  //     '<button class="btn btn-info mpr-prev-year">Previous Year</button>';
+  //   content += "</div>";
+  //   content += "</div>";
   $(document).on("click", ".mpr-month", function (e) {
     e.stopPropagation();
     $month = $(this);
@@ -79,10 +41,121 @@ $(function () {
       }
       console.log(endDate, "end date");
     }
-
     paintMonths();
   });
-
+  $(document).on("click", ".mpr-yearup", function (e) {
+    e.stopPropagation();
+    var year = parseInt($(this).prev().html());
+    year++;
+    $(this)
+      .prev()
+      .html("" + year);
+    $(this)
+      .parents(".mpr-calendar")
+      .find(".mpr-MonthsWrapper")
+      .fadeOut(175, function () {
+        paintMonths();
+        $(this).parents(".mpr-calendar").find(".mpr-MonthsWrapper").fadeIn(175);
+      });
+  });
+  $(document).on("click", ".mpr-yeardown", function (e) {
+    e.stopPropagation();
+    var year = parseInt($(this).next().html());
+    year--;
+    $(this)
+      .next()
+      .html("" + year);
+    //paintMonths();
+    $(this)
+      .parents(".mpr-calendar")
+      .find(".mpr-MonthsWrapper")
+      .fadeOut(175, function () {
+        paintMonths();
+        $(this).parents(".mpr-calendar").find(".mpr-MonthsWrapper").fadeIn(175);
+      });
+  });
+  $(document).on("click", ".mpr-ytd", function (e) {
+    e.stopPropagation();
+    var d = new Date();
+    startDate = parseInt(d.getFullYear() + "01");
+    var month = d.getMonth() + 1;
+    if (month < 9) month = "0" + month;
+    endDate = parseInt("" + d.getFullYear() + month);
+    $(".mpr-calendar").each(function () {
+      var $cal = $(this);
+      var year = $("h5 span", $cal).html(d.getFullYear());
+    });
+    $(".mpr-calendar")
+      .find(".mpr-MonthsWrapper")
+      .fadeOut(175, function () {
+        paintMonths();
+        $(".mpr-calendar").find(".mpr-MonthsWrapper").fadeIn(175);
+      });
+  });
+  $(document).on("click", ".mpr-prev-year", function (e) {
+    e.stopPropagation();
+    var d = new Date();
+    var year = d.getFullYear() - 1;
+    startDate = parseInt(year + "01");
+    endDate = parseInt(year + "12");
+    $(".mpr-calendar").each(function () {
+      var $cal = $(this);
+      $("h5 span", $cal).html(year);
+    });
+    $(".mpr-calendar")
+      .find(".mpr-MonthsWrapper")
+      .fadeOut(175, function () {
+        paintMonths();
+        $(".mpr-calendar").find(".mpr-MonthsWrapper").fadeIn(175);
+      });
+  });
+  $(document).on("click", ".mpr-fiscal-ytd", function (e) {
+    e.stopPropagation();
+    var d = new Date();
+    var year;
+    if (d.getMonth() + 1 < fiscalMonth) year = d.getFullYear() - 1;
+    else year = d.getFullYear();
+    if (fiscalMonth < 10) fm = "0" + fiscalMonth;
+    else fm = fiscalMonth;
+    if (d.getMonth() + 1 < 10) cm = "0" + (d.getMonth() + 1);
+    else cm = d.getMonth() + 1;
+    startDate = parseInt("" + year + fm);
+    endDate = parseInt("" + d.getFullYear() + cm);
+    $(".mpr-calendar").each(function (i) {
+      var $cal = $(this);
+      if (i == 0) $("h5 span", $cal).html(year);
+      else $("h5 span", $cal).html(d.getFullYear());
+    });
+    $(".mpr-calendar")
+      .find(".mpr-MonthsWrapper")
+      .fadeOut(175, function () {
+        paintMonths();
+        $(".mpr-calendar").find(".mpr-MonthsWrapper").fadeIn(175);
+      });
+  });
+  $(document).on("click", ".mpr-prev-fiscal", function () {
+    var d = new Date();
+    var year;
+    if (d.getMonth() + 1 < fiscalMonth) year = d.getFullYear() - 2;
+    else year = d.getFullYear() - 1;
+    if (fiscalMonth < 10) fm = "0" + fiscalMonth;
+    else fm = fiscalMonth;
+    if (fiscalMonth - 1 < 10) efm = "0" + (fiscalMonth - 1);
+    else efm = fiscalMonth - 1;
+    startDate = parseInt("" + year + fm);
+    endDate = parseInt("" + (d.getFullYear() - 1) + efm);
+    $(".mpr-calendar").each(function (i) {
+      var $cal = $(this);
+      if (i == 0) $("h5 span", $cal).html(year);
+      else $("h5 span", $cal).html(d.getFullYear() - 1);
+    });
+    $(".mpr-calendar")
+      .find(".mpr-MonthsWrapper")
+      .fadeOut(175, function () {
+        paintMonths();
+        $(".mpr-calendar").find(".mpr-MonthsWrapper").fadeIn(175);
+      });
+  });
   var mprVisible = false;
   var mprpopover = $(".mrp-container")
     .popover({
@@ -107,7 +180,6 @@ $(function () {
     .on("hidden.bs.popover", function () {
       mprVisible = false;
     });
-
   $(document).on("click", ".mpr-calendarholder", function (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -131,14 +203,12 @@ $(function () {
     }
   });
 });
-
 function setViewToCurrentYears() {
   var startyear = parseInt(startDate / 100);
   var endyear = parseInt(endDate / 100);
   $(".mpr-calendar h5 span").eq(0).html(startyear);
   $(".mpr-calendar h5 span").eq(1).html(endyear);
 }
-
 function paintMonths() {
   $(".mpr-calendar").each(function () {
     var $cal = $(this);
@@ -172,7 +242,6 @@ function paintMonths() {
   if (endyear == parseInt($(".mpr-calendar:last h5 span").html()))
     $(".mpr-calendar:last .mpr-selected:last").css("background", "#40667A");
 }
-
 function safeRound(val) {
   return Math.round((val + 0.00001) * 100) / 100;
 }
